@@ -1,0 +1,27 @@
+name: lw-solar-fm
+channels:
+  - pytorch
+  - nvidia # Assuming CUDA might be needed, add if not
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.11 # Or your preferred Python version
+  - pip:
+    - -e .
+  - pytorch
+  - torchvision
+  - torchaudio
+  - pytorch-lightning
+  - hydra-core
+  - pip:
+    - loguru
+    - timm
+    - zarr<=3.0.0
+    - xarray # Used in visualize_xrs_performance.py
+    - matplotlib
+    - numpy
+    - omegaconf
+    # Add any other specific dependencies from your project here
+    # For example, if terratorch_surya is a conda package, list it directly.
+    # If it's pip-only, keep it under 'pip:'.
+    # - terratorch_surya 

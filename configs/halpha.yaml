@@ -1,0 +1,90 @@
+defaults:
+  - _self_
+
+# Model Configuration
+model:
+  in_channels: 1  # Number of channels (soft, hard)
+  seq_len: 1440
+  embed_dim: 768  # Reduced embed_dim for lightweight model
+  encoder_depth: 4
+  decoder_depth: 2
+  num_heads: 8
+  data_type: "2d"  # Options: "1d" or "2d"
+  image_size: 512  # Only used if data_type is "2d"
+  patch_size: 16   # Only used if data_type is "2d"
+  mask_ratio: null
+
+# Optimizer Configuration
+optimizer:
+  type: adamw  # Options: "adam" or "adamw"
+  lr: 1e-4
+  weight_decay: 0.01
+  eps: 1e-7
+  betas: [0.9, 0.999]
+  # Scheduler Configuration
+  scheduler:
+    use: cosine_warmup  # Options: "cosine_warmup" or null for constant LR
+    monitor: val/loss
+    # Cosine warmup parameters
+    cosine_warmup:
+      total_steps: 10000  # Total training steps (set to max_epochs * steps_per_epoch approx)
+      warmup_ratio: 0.1  # Warmup ratio (10% of total steps)
+      min_lr: 1e-8  # Minimum learning rate after decay
+
+# Loss Configuration
+loss:
+  type: mse  # Options: "mse", "mae", or "rmse"
+
+# DataModule Configuration
+data:
+  zarr_path: ./data/gong_halpha_2015_2025.zarr
+  train_index_path: ./data/pretrain/train.csv
+  val_index_path: ./data/pretrain/val.csv
+  test_index_path: ./data/pretrain/test.csv
+  channels:  # List of channels to load
+    - images
+    # - soft
+    # - hard
+  batch_size: 32
+  num_workers: 6
+  data_type: "1d"  # Must match model.data_type
+  scalers: ./data/xrs_stat_train.yaml # Normalization statistics
+
+# Trainer Configuration
+trainer:
+  max_epochs: 100
+  accelerator: auto
+  devices: 1
+  precision: 32
+  accumulate_grad_batches: 8
+  gradient_clip_val: 1.0
+
+# Logging
+logger:
+  tensorboard: true
+  log_every_n_steps: 4
+
+# Wandb Configuration
+wandb:
+  name: halpha_pretrain_debug
+  id: halpha_pretrain_debug
+  resume: allow
+  save_dir: ./results
+  entity: gsu-dmlab
+  project: modality-adapter
+  group: halpha
+  log_model: false
+  notes: "pretraining run"
+  offline: false
+  save_code: false
+  tag: ["pretrain", "mae", "halpha"]
+
+etc:
+  resume: false
+  ckpt_dir: ./results/check_point/pretrain/halpha/
+  ckpt_name_tag: halpha_1e-4_medium
+  ckpt_file: null
+  ckpt_weights_only: false
+  save_test_results_path: ./results/
+  enable_version_counter: False
+

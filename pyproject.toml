@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "lw-solar-fm"
+version = "0.1.0"
+authors = [
+  { name="Your Name", email="your.email@example.com" },
+]
+description = "A lightweight foundation model for solar data."
+readme = "README.md"
+requires-python = ">=3.8"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+
+dependencies = [
+    "torch",
+    "pytorch-lightning",
+    "hydra-core",
+    "loguru",
+    "timm", # Assuming timm is a dependency based on warnings
+    "zarr", # Assuming zarr is a dependency for data loading
+]
+
+[project.urls]
+"Homepage" = "https://github.com/yourusername/lightweight-solar-fm"
+"Bug Tracker" = "https://github.com/yourusername/lightweight-solar-fm/issues"
