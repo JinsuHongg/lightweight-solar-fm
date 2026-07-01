@@ -1,0 +1,56 @@
+# @package _global_
+
+data:
+  train_flare_data_path: ../data/surya-bench-flare-forecasting/M24w/train_M24w_freq4.csv
+  valid_flare_data_path: ../data/surya-bench-flare-forecasting/M24w/val_M24w.csv
+  leaky_valid_flare_data_path: ../data/surya-bench-flare-forecasting/M24w/leaky_val_M24w.csv
+  test_flare_data_path: ../data/surya-bench-flare-forecasting/M24w/test_M24w.csv
+  undersample_factor: 1
+  seed: 1004
+
+backbone:
+  pooling_type: attention_pooling
+
+fusion:
+  type: cross_attention  # "concat", "gated", or "cross_attention"
+  fuse_embed_dim: 1280  # used only for gated/cross_attention
+  num_heads: 8  # used only for cross_attention
+
+secondary:
+  pooling_type: attention_pooling  # "avg_pooling", "max_pooling", "attention_pooling", "none"
+
+head:
+  hyper_parameters:
+    hidden_channels: [1024, 256, 1] #[256, 64, 1]
+
+loss:
+  type: cross_entropy
+  cross_entropy:
+    class_weights: [1.0, 1.0]
+  focal:
+    alpha: 0.75
+    gamma: 2.0
+    reduction: mean
+
+optimizer:
+  type: adamw
+  lr: 1e-5
+  weight_decay: 1e-3
+
+etc:
+  phase: train # test
+  resume: false
+  ckpt_dir: ../results/check_point/suryaflux/daily_m/cross/
+  ckpt_name_tag: flux_daily_m_crossen_cross_undersample
+  ckpt_file: last.ckpt
+  ckpt_weights_only: false
+  max_epochs: 50
+
+wandb:
+  name: flux_daily_m_crossen_cross_undersample_nasgh
+  id: flux_daily_m_crossen_cross_undersample_nasgh
+  group: xrs
+  resume: allow
+  notes: "xray flux head"
+  offline: false
+  tag: ["fluxhead", "M", "daily", "nasgh", "crossen", "cross"] # backbone model, head type, task

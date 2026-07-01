@@ -1,0 +1,90 @@
+defaults:
+  - _self_
+
+# Model Configuration
+model:
+  in_channels: 1  # Number of channels (c2)
+  seq_len: 1024   # (512/16)^2 patches
+  embed_dim: 768 # 256, 768, 1280
+  encoder_depth: 4
+  decoder_depth: 2
+  num_heads: 8
+  data_type: "2d"
+  image_size: 512
+  patch_size: 16
+  mask_ratio: null
+
+# Optimizer Configuration
+optimizer:
+  type: adamw
+  lr: 1e-4
+  weight_decay: 0.01
+  eps: 1e-7
+  betas: [0.9, 0.999]
+  # Scheduler Configuration
+  scheduler:
+    use: cosine_warmup
+    monitor: val/loss
+    cosine_warmup:
+      total_steps: 10000
+      warmup_ratio: 0.1
+      min_lr: 1e-8
+
+# Loss Configuration
+loss:
+  type: mse
+
+# DataModule Configuration
+data:
+  zarr_path: /nobackupnfs1/sroy14/processed_data/helio/soho_lasco_c2_2010_2025_v1.zarr
+  train_index_path: ./data/pretrain/train.csv
+  val_index_path: ./data/pretrain/val.csv
+  test_index_path: ./data/pretrain/test.csv
+  channels:
+    - images
+  batch_size: 16
+  num_workers: 6
+  data_type: "2d"
+  scalers: ./data/lasco_c2_stat_train.yaml
+  norm_type: "zscore"
+
+# Trainer Configuration
+trainer:
+  phase: test
+  max_epochs: 100
+  accelerator: auto
+  devices: 1
+  precision: 32
+  accumulate_grad_batches: 8
+  gradient_clip_val: 1.0
+
+# Logging
+logger:
+  tensorboard: true
+  log_every_n_steps: 4
+
+# Wandb Configuration
+wandb:
+  name: lasco_c2_pretrain_medium_test
+  id: lasco_c2_pretrain_medium_test
+  resume: allow
+  save_dir: ./results
+  entity: gsu-dmlab
+  project: modality-adapter
+  group: lasco_c2
+  log_model: false
+  notes: "LASCO C2 pretraining run"
+  offline: false
+  save_code: false
+  tag: ["pretrain", "mae", "lasco_c2"]
+
+etc:
+  resume: false
+  ckpt_dir: ./results/check_point/pretrain/lasco_c2/
+  ckpt_name_tag: lasco_c2_1e-4_small
+  ckpt_file: lasco_c2_1e-4_medium_lr0.0001_wd0.01_epoch=75.ckpt
+  ckpt_weights_only: false
+  save_test_results_path: ./results/
+  enable_version_counter: False
+  vis_out_dir: ./results/vis/lasco_c2/
+  vis_out_name: visualization_lasco_c2.png

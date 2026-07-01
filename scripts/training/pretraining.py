@@ -60,6 +60,7 @@ def train(cfg: OmegaConf):
         num_workers=cfg.data.num_workers,
         data_type=cfg.data.data_type,
         scalers=cfg.data.get("scalers", None),
+        norm_type=cfg.data.get("norm_type", "log_zscore"),
     )
 
     # Load model
@@ -106,6 +107,8 @@ def train(cfg: OmegaConf):
         trainer.test(
             model=model,
             dataloaders=datamodule,
+            ckpt_path=os.path.join(cfg.etc.ckpt_dir, cfg.etc.ckpt_file),
+            weights_only=False,
             verbose=True,
         )
     elif phase == "predict":
