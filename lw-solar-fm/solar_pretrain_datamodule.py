@@ -21,6 +21,7 @@ class SolarPretrainDataModule(pl.LightningDataModule):
         num_workers: int = 4,
         data_type: str = "1d",
         scalers: DictConfig | None = None,
+        norm_type: str = "log_zscore",
     ):
         """
         Args:
@@ -33,6 +34,7 @@ class SolarPretrainDataModule(pl.LightningDataModule):
             num_workers (int): Number of workers for data loading.
             data_type (str): Type of data, either '1d' or '2d'.
             scalers (DictConfig, optional): Normalization statistics.
+            norm_type (str): Normalization type, either 'log_zscore' or 'zscore'.
         """
         super().__init__()
         self.zarr_path = zarr_path
@@ -43,7 +45,8 @@ class SolarPretrainDataModule(pl.LightningDataModule):
         self.batch_size = batch_size
         self.num_workers = num_workers
         self.data_type = data_type
-        self.scalers = OmegaConf.load(scalers)
+        self.norm_type = norm_type
+        self.scalers = OmegaConf.load(scalers) if scalers else None
 
     def setup(self, stage=None):
         """
@@ -57,6 +60,7 @@ class SolarPretrainDataModule(pl.LightningDataModule):
                 scalers=self.scalers,
                 data_type=self.data_type,
                 phase="train",
+                norm_type=self.norm_type,
             )
             self.val_dataset = SolarPretrainDataset(
                 zarr_path=self.zarr_path,
@@ -65,6 +69,7 @@ class SolarPretrainDataModule(pl.LightningDataModule):
                 scalers=self.scalers,
                 data_type=self.data_type,
                 phase="val",
+                norm_type=self.norm_type,
             )
 
         if stage == "test" or stage is None:
@@ -75,6 +80,7 @@ class SolarPretrainDataModule(pl.LightningDataModule):
                 scalers=self.scalers,
                 data_type=self.data_type,
                 phase="test",
+                norm_type=self.norm_type,
             )
 
     def train_dataloader(self):

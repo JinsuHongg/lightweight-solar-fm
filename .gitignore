@@ -216,3 +216,9 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Agents
+AGENTS.md
+
+# Shell Scripts
+shell_scripts/
